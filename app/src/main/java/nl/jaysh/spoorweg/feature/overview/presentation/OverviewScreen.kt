@@ -3,6 +3,7 @@ package nl.jaysh.spoorweg.feature.overview.presentation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -26,5 +27,13 @@ fun OverviewScreen(viewModel: OverviewViewModel = hiltViewModel()) {
 private fun OverviewScreenContent(state: OverviewState) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "Overview")
+
+        TextField(
+            value = "",
+            placeholder = {
+                Text("Text")
+            },
+            onValueChange = {},
+        )
     }
 }
