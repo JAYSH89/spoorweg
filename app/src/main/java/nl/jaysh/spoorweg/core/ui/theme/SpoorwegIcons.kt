@@ -67,7 +67,7 @@ data class SpoorwegIcons(
     val plane: Int = R.drawable.plane,
     val question: Int = R.drawable.question,
     val removePeriodCard: Int = R.drawable.remove_period_card,
-    val resourceSwitch: Int = R.drawable.resource_switch,
+    val switch: Int = R.drawable.resource_switch,
     val rideShare: Int = R.drawable.ride_share,
     val scanCreditCard: Int = R.drawable.scan_credit_card,
     val search: Int = R.drawable.search,
