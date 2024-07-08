@@ -3,15 +3,20 @@ package nl.jaysh.spoorweg.feature.overview.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,11 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import nl.jaysh.spoorweg.core.ui.components.picker.SpoorwegDatePicker
+import nl.jaysh.spoorweg.core.ui.components.picker.SpoorwegTimePicker
 import nl.jaysh.spoorweg.core.ui.components.textfield.SpoorwegTextField
 import nl.jaysh.spoorweg.core.ui.theme.SpoorwegIcons
 import nl.jaysh.spoorweg.core.ui.theme.SpoorwegTheme
 import nl.jaysh.spoorweg.core.ui.theme.crayolaYellow
 import nl.jaysh.spoorweg.core.ui.theme.peachBlossom
+import java.time.LocalTime
 
 @Preview(showBackground = true)
 @Composable
@@ -61,21 +69,24 @@ private fun OverviewScreenContent(
             text = "Plan your journey",
             style = MaterialTheme.typography.headlineLarge,
         )
+
         TripInput(
-            departureValue = state.departure,
-            destinationValue = state.destination,
+            state = state,
             onEvent = onEvent,
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TripInput(
     modifier: Modifier = Modifier,
-    departureValue: String,
-    destinationValue: String,
+    state: OverviewState,
     onEvent: (OverviewEvent) -> Unit,
 ) {
+    val datePickerVisible = remember { mutableStateOf(false) }
+    val timePickerVisible = remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -85,9 +96,49 @@ private fun TripInput(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DepartureTextField(value = departureValue, onEvent = onEvent)
+        DepartureTextField(value = state.departure, onEvent = onEvent)
 
-        DestinationTextField(value = destinationValue, onEvent = onEvent)
+        DestinationTextField(value = state.destination, onEvent = onEvent)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(
+                onClick = { datePickerVisible.value = !datePickerVisible.value },
+                content = { Text(text = "Datepicker") }
+            )
+
+            Button(
+                onClick = { timePickerVisible.value = !timePickerVisible.value },
+                content = { Text(text = "Timepicker") },
+            )
+
+            SpoorwegDatePicker(
+                date = state.selectedDate.toLocalDate(),
+                visible = datePickerVisible.value,
+                onDismissRequest = { datePickerVisible.value = !datePickerVisible.value },
+                onConfirm = { millis ->
+                    val event = OverviewEvent.DatePickerValueChanged(selectedMillis = millis)
+                    onEvent(event)
+
+                    datePickerVisible.value = !datePickerVisible.value
+                },
+            )
+
+            SpoorwegTimePicker(
+                hour = state.selectedDate.hour,
+                minute = state.selectedDate.minute,
+                visible = timePickerVisible.value,
+                onDismissRequest = { timePickerVisible.value = !timePickerVisible.value },
+                onConfirm = { (hour, minute) ->
+                    val event = OverviewEvent.TimePickerValueChanged(
+                        hour = hour,
+                        minute = minute,
+                    )
+                    onEvent(event)
+
+                    timePickerVisible.value = !timePickerVisible.value
+                }
+            )
+        }
 
         SearchButton { onEvent(OverviewEvent.SearchButtonPressed) }
     }
