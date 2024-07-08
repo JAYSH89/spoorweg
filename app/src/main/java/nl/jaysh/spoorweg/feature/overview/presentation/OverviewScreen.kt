@@ -4,12 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +38,7 @@ import nl.jaysh.spoorweg.core.ui.theme.SpoorwegIcons
 import nl.jaysh.spoorweg.core.ui.theme.SpoorwegTheme
 import nl.jaysh.spoorweg.core.ui.theme.crayolaYellow
 import nl.jaysh.spoorweg.core.ui.theme.peachBlossom
-import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Preview(showBackground = true)
 @Composable
@@ -77,7 +83,6 @@ private fun OverviewScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TripInput(
     modifier: Modifier = Modifier,
@@ -100,16 +105,68 @@ private fun TripInput(
 
         DestinationTextField(value = state.destination, onEvent = onEvent)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Button(
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonColors(
+                    containerColor = Color.Black,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                    disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                ),
                 onClick = { datePickerVisible.value = !datePickerVisible.value },
-                content = { Text(text = "Datepicker") }
+                content = {
+                    Text(
+                        text = state.selectedDate.format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             )
 
+            Spacer(modifier = Modifier.width(12.dp))
+
             Button(
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonColors(
+                    containerColor = Color.Black,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                    disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                ),
                 onClick = { timePickerVisible.value = !timePickerVisible.value },
-                content = { Text(text = "Timepicker") },
+                content = {
+                    Text(
+                        text = state.selectedDate.format(
+                            DateTimeFormatter.ofPattern("HH:mm"),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Icon(
+                        painter = painterResource(id = SpoorwegIcons().clock),
+                        contentDescription = "clock",
+                        tint = MaterialTheme.colorScheme.inverseOnSurface,
+                    )
+                },
             )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            IconButton(onClick = { onEvent(OverviewEvent.ResetDateTimePicker) }) {
+                Icon(
+                    painter = painterResource(id = SpoorwegIcons().history),
+                    contentDescription = "now",
+                    tint = MaterialTheme.colorScheme.inverseOnSurface,
+                )
+            }
 
             SpoorwegDatePicker(
                 date = state.selectedDate.toLocalDate(),

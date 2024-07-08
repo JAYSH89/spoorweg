@@ -38,6 +38,10 @@ class OverviewViewModel @Inject constructor(
                 hour = event.hour,
                 minute = event.minute
             )
+
+            OverviewEvent.ResetDateTimePicker -> _state.update {
+                it.copy(selectedDate = OffsetDateTime.now())
+            }
         }
     }
 
@@ -67,6 +71,7 @@ sealed interface OverviewEvent {
     data class DestinationValueChanged(val destination: String) : OverviewEvent
     data class DatePickerValueChanged(val selectedMillis: Long) : OverviewEvent
     data class TimePickerValueChanged(val hour: Int, val minute: Int) : OverviewEvent
+    data object ResetDateTimePicker : OverviewEvent
     data object SearchButtonPressed : OverviewEvent
 }
 
