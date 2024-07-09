@@ -3,6 +3,8 @@ package nl.jaysh.spoorweg.feature.overview.presentation
 import app.cash.turbine.test
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import nl.jaysh.spoorweg.core.data.RailwayRepository
 import org.junit.Before
@@ -13,6 +15,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class OverviewViewModelTest {
 
     @MockK
@@ -20,10 +23,15 @@ class OverviewViewModelTest {
 
     private lateinit var viewModel: OverviewViewModel
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        viewModel = OverviewViewModel(railwayRepository = railwayRepository)
+        viewModel = OverviewViewModel(
+            dispatcher = testDispatcher,
+            railwayRepository = railwayRepository,
+        )
     }
 
     @Test
@@ -90,14 +98,6 @@ class OverviewViewModelTest {
 
             awaitItem()
             assertEquals(expected = date, actual = awaitItem().selectedDate)
-        }
-    }
-
-    @Test
-    fun `test SearchButtonPressed event`() = runTest {
-        viewModel.state.test {
-            viewModel.onEvent(OverviewEvent.SearchButtonPressed)
-            // TODO
         }
     }
 }

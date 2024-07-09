@@ -17,6 +17,7 @@ class RailwayService @Inject constructor(private val httpClient: HttpClient) {
             parameter("q", query)
         }
 
+        // TODO: ERROR HANDLING
         val body = response.body<StationResponse>()
         return body.payload
     }
@@ -34,6 +35,7 @@ class RailwayService @Inject constructor(private val httpClient: HttpClient) {
             parameter("searchForArrive", searchForArrival)
         }
 
+        // TODO: ERROR HANDLING
         val body = response.body<TripResponse>()
         return body.trips
     }

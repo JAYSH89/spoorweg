@@ -176,7 +176,7 @@ private fun TripInput(
             )
         }
 
-        SearchButton { onEvent(OverviewEvent.SearchButtonPressed) }
+        SearchButton { }
     }
 }
 
