@@ -101,66 +101,45 @@ private fun TripInput(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        DepartureTextField(value = state.departure, onEvent = onEvent)
+        DepartureTextField(
+            value = state.departure,
+            onEvent = onEvent,
+            onClickTrailingIcon = {},
+        )
 
-        DestinationTextField(value = state.destination, onEvent = onEvent)
+        DestinationTextField(
+            value = state.destination,
+            onEvent = onEvent,
+            onClickTrailingIcon = {},
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Button(
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonColors(
-                    containerColor = Color.Black,
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                    disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                ),
+            DateTimeButton(
                 onClick = { datePickerVisible.value = !datePickerVisible.value },
-                content = {
-                    Text(
-                        text = state.selectedDate.format(
-                            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
+                text = state.selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            DateTimeButton(
+                onClick = { timePickerVisible.value = !timePickerVisible.value },
+                text = state.selectedDate.format(DateTimeFormatter.ofPattern("HH:mm")),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = SpoorwegIcons().clock),
+                        contentDescription = "clock",
+                        tint = MaterialTheme.colorScheme.inverseOnSurface,
                     )
                 }
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Button(
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonColors(
-                    containerColor = Color.Black,
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                    disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                ),
-                onClick = { timePickerVisible.value = !timePickerVisible.value },
-                content = {
-                    Text(
-                        text = state.selectedDate.format(
-                            DateTimeFormatter.ofPattern("HH:mm"),
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Icon(
-                        painter = painterResource(id = SpoorwegIcons().clock),
-                        contentDescription = "clock",
-                        tint = MaterialTheme.colorScheme.inverseOnSurface,
-                    )
-                },
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            IconButton(onClick = { onEvent(OverviewEvent.ResetDateTimePicker) }) {
+            IconButton(onClick = { onEvent(OverviewEvent.ResetDateTimePicker()) }) {
                 Icon(
                     painter = painterResource(id = SpoorwegIcons().history),
                     contentDescription = "now",
@@ -206,6 +185,7 @@ private fun DepartureTextField(
     modifier: Modifier = Modifier,
     value: String,
     onEvent: (OverviewEvent) -> Unit,
+    onClickTrailingIcon: () -> Unit,
 ) {
     SpoorwegTextField(
         modifier = modifier.fillMaxWidth(),
@@ -214,7 +194,7 @@ private fun DepartureTextField(
         leadingIcon = SpoorwegIcons().tracking,
         trailingIcon = SpoorwegIcons().close,
         onValueChange = { onEvent(OverviewEvent.DepartureValueChanged(departure = it)) },
-        onClickTrailingIcon = {},
+        onClickTrailingIcon = onClickTrailingIcon,
     )
 }
 
@@ -223,6 +203,7 @@ private fun DestinationTextField(
     modifier: Modifier = Modifier,
     value: String,
     onEvent: (OverviewEvent) -> Unit,
+    onClickTrailingIcon: () -> Unit,
 ) {
     SpoorwegTextField(
         modifier = modifier.fillMaxWidth(),
@@ -231,24 +212,50 @@ private fun DestinationTextField(
         leadingIcon = SpoorwegIcons().locationPin,
         trailingIcon = SpoorwegIcons().switch,
         onValueChange = { onEvent(OverviewEvent.DestinationValueChanged(destination = it)) },
-        onClickTrailingIcon = {},
+        onClickTrailingIcon = onClickTrailingIcon,
     )
 }
 
 @Composable
-private fun SearchButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
+private fun SearchButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     TextButton(
         modifier = modifier.fillMaxWidth(),
-        content = {
-            Text(
-                modifier = Modifier.padding(vertical = 8.dp),
-                text = "Plan your trip",
-                color = MaterialTheme.colorScheme.inverseOnSurface,
-            )
-        },
         onClick = onClick,
-    )
+    ) {
+        Text(
+            modifier = Modifier.padding(vertical = 8.dp),
+            text = "Plan your trip",
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+        )
+    }
+}
+
+@Composable
+private fun DateTimeButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    text: String,
+    trailingIcon: (@Composable () -> Unit)? = null,
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonColors(
+            containerColor = Color.Black,
+            contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+        ),
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        if (trailingIcon != null) {
+            Spacer(modifier = Modifier.width(8.dp))
+            trailingIcon.invoke()
+        }
+    }
 }

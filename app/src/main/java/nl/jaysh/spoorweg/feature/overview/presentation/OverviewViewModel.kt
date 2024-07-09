@@ -1,5 +1,6 @@
 package nl.jaysh.spoorweg.feature.overview.presentation
 
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,8 +40,8 @@ class OverviewViewModel @Inject constructor(
                 minute = event.minute
             )
 
-            OverviewEvent.ResetDateTimePicker -> _state.update {
-                it.copy(selectedDate = OffsetDateTime.now())
+            is OverviewEvent.ResetDateTimePicker -> _state.update {
+                it.copy(selectedDate = event.date ?: OffsetDateTime.now())
             }
         }
     }
@@ -71,7 +72,7 @@ sealed interface OverviewEvent {
     data class DestinationValueChanged(val destination: String) : OverviewEvent
     data class DatePickerValueChanged(val selectedMillis: Long) : OverviewEvent
     data class TimePickerValueChanged(val hour: Int, val minute: Int) : OverviewEvent
-    data object ResetDateTimePicker : OverviewEvent
+    data class ResetDateTimePicker(val date: OffsetDateTime? = null) : OverviewEvent
     data object SearchButtonPressed : OverviewEvent
 }
 
