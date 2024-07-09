@@ -54,6 +54,16 @@ class OverviewViewModel @Inject constructor(
             is OverviewEvent.ResetDateTimePicker -> _state.update {
                 it.copy(selectedDate = event.date ?: OffsetDateTime.now())
             }
+
+            is OverviewEvent.SelectSuggestedDeparture -> selectSuggestion(
+                isDeparture = true,
+                station = event.departure,
+            )
+
+            is OverviewEvent.SelectSuggestedDestination -> selectSuggestion(
+                isDeparture = false,
+                station = event.destination,
+            )
         }
     }
 
@@ -66,6 +76,15 @@ class OverviewViewModel @Inject constructor(
             val stationSuggestions = railwayRepository.getStation(query = query)
             _state.update { it.copy(isLoading = false, stationSuggestions = stationSuggestions) }
         }
+    }
+
+    private fun selectSuggestion(isDeparture: Boolean, station: Station) {
+        if (isDeparture) {
+            _state.update { it.copy(selectedDeparture = station, departure = station.name) }
+        } else {
+            _state.update { it.copy(selectedDestination = station, destination = station.name) }
+        }
+        _state.update { it.copy(stationSuggestions = emptyList()) }
     }
 
     private fun updateTime(hour: Int, minute: Int) {
@@ -87,7 +106,9 @@ class OverviewViewModel @Inject constructor(
 
 sealed interface OverviewEvent {
     data class DepartureValueChanged(val departure: String) : OverviewEvent
+    data class SelectSuggestedDeparture(val departure: Station) : OverviewEvent
     data class DestinationValueChanged(val destination: String) : OverviewEvent
+    data class SelectSuggestedDestination(val destination: Station) : OverviewEvent
     data class DatePickerValueChanged(val selectedMillis: Long) : OverviewEvent
     data class TimePickerValueChanged(val hour: Int, val minute: Int) : OverviewEvent
     data class ResetDateTimePicker(val date: OffsetDateTime? = null) : OverviewEvent
@@ -96,7 +117,9 @@ sealed interface OverviewEvent {
 data class OverviewState(
     val isLoading: Boolean = false,
     val departure: String = "",
+    val selectedDeparture: Station? = null,
     val destination: String = "",
+    val selectedDestination: Station? = null,
     val stationSuggestions: List<Station> = emptyList(),
     val selectedDate: OffsetDateTime = OffsetDateTime.now(),
 )

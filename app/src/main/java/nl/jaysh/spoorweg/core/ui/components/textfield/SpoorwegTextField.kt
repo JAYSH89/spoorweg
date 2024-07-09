@@ -28,8 +28,10 @@ fun SpoorwegTextField(
         modifier = modifier,
         value = value,
         shape = RoundedCornerShape(16.dp),
+        textStyle = MaterialTheme.typography.bodyMedium,
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
             unfocusedContainerColor = Color.Black,
             focusedContainerColor = Color.Black,
             focusedIndicatorColor = Color.Transparent,

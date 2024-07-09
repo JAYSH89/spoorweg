@@ -3,12 +3,15 @@ package nl.jaysh.spoorweg.feature.overview.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -27,10 +30,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import nl.jaysh.spoorweg.core.model.station.Station
 import nl.jaysh.spoorweg.core.ui.components.picker.SpoorwegDatePicker
 import nl.jaysh.spoorweg.core.ui.components.picker.SpoorwegTimePicker
 import nl.jaysh.spoorweg.core.ui.components.textfield.SpoorwegTextField
@@ -53,10 +58,7 @@ fun OverviewScreen(viewModel: OverviewViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun OverviewScreenContent(
-    state: OverviewState,
-    onEvent: (OverviewEvent) -> Unit,
-) {
+private fun OverviewScreenContent(state: OverviewState, onEvent: (OverviewEvent) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,20 +73,16 @@ private fun OverviewScreenContent(
             .padding(all = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Text(
-            text = "Plan your journey",
-            style = MaterialTheme.typography.headlineLarge,
-        )
+        Text(text = "Plan your journey", style = MaterialTheme.typography.headlineLarge)
 
-        TripInput(
-            state = state,
-            onEvent = onEvent,
-        )
+        OverviewInputCard(state = state, onEvent = onEvent)
+
+        StationSuggestions(suggestedStations = state.stationSuggestions, onEvent = onEvent)
     }
 }
 
 @Composable
-private fun TripInput(
+private fun OverviewInputCard(
     modifier: Modifier = Modifier,
     state: OverviewState,
     onEvent: (OverviewEvent) -> Unit,
@@ -177,6 +175,44 @@ private fun TripInput(
         }
 
         SearchButton { }
+    }
+}
+
+@Composable
+private fun StationSuggestions(
+    modifier: Modifier = Modifier,
+    suggestedStations: List<Station>,
+    onEvent: (OverviewEvent) -> Unit,
+) {
+    if (suggestedStations.isNotEmpty()) {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .clip(shape = RoundedCornerShape(size = 28.dp))
+                .background(color = Color.White),
+            contentPadding = PaddingValues(all = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+        ) {
+            items(suggestedStations) { station ->
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        val event = OverviewEvent.SelectSuggestedDeparture(station)
+                        onEvent(event)
+                    },
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp, vertical = 8.dp),
+                        text = station.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Start,
+                    )
+                }
+            }
+        }
     }
 }
 
