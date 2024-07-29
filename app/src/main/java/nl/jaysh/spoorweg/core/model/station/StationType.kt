@@ -1,0 +1,13 @@
+package nl.jaysh.spoorweg.core.model.station
+
+enum class StationType {
+    LOCAL_TRAIN_STATION,
+    LOCAL_TRAIN_HUB_STATION,
+    EXPRESS_TRAIN_STATION,
+    EXPRESS_TRAIN_HUB_STATION,
+    INTERCITY_STATION,
+    INTERCITY_HUB_STATION,
+    MEGA_STATION,
+    OPTIONAL_STATION,
+    UNKNOWN;
+}
